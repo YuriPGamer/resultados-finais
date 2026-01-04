@@ -88,41 +88,24 @@
       /* --- TELA DE LOGIN --- */
       #login-screen { position: fixed; inset: 0; width: 100%; height: 100dvh; overflow-y: auto; background: var(--background); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
-      /* --- BOTÃO CUSTOMIZADO ESTÁVEL --- */
-      .google-btn-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 8px 24px 8px 8px; /* Padding maior na direita pro texto */
-        background-color: var(--background);
-        border: 1px solid var(--outline);
-        border-radius: 50px; /* Pill Shape */
+      /* --- MÁSCARA DO BOTÃO (O SEGREDO DA ESTABILIDADE) --- */
+      .login-slot {
         width: 100%;
-        max-width: 280px;
-        cursor: pointer;
-        transition: background 0.2s;
-        min-height: 56px; /* Altura fixa para evitar pulos */
+        min-height: 50px; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 1rem;
+        
+        /* Começa INVISÍVEL */
+        opacity: 0; 
+        /* Quando aparecer, leva 0.5s para surgir suavemente */
+        transition: opacity 0.5s ease;
       }
       
-      .google-btn-wrapper:hover {
-        background-color: var(--surface-container);
-      }
-
-      /* Texto Estático do Botão */
-      .google-btn-text {
-        font-family: 'Roboto', sans-serif;
-        font-weight: 500;
-        color: var(--text-main);
-        font-size: 1rem;
-      }
-
-      /* Onde o botão real do Google vai morar */
-      #btn-google-area {
-        height: 40px;
-        width: 40px; /* Tamanho exato do ícone */
-        overflow: hidden; /* Garante que só o ícone apareça */
-        border-radius: 50%;
+      /* Classe de ativação */
+      .login-slot.visible {
+        opacity: 1;
       }
     
     </style>
@@ -139,16 +122,11 @@
         
         <div class="d-flex flex-column align-items-center justify-content-center w-100">
             
-            <div class="google-btn-wrapper position-relative">
-                
+            <div class="login-slot" id="google-btn-container">
                 <div id="btn-google-area"></div>
-                
-                <span class="google-btn-text">Entrar com Google</span>
-
-                </div>
-            <p class="text-center mt-2" style="font-size: 0.7rem; color: var(--text-secondary); opacity: 0.7;">Clique no ícone "G" para entrar</p>
+            </div>
             
-            <div id="login-error" class="text-danger small fw-bold text-center mt-3"></div>
+            <div id="login-error" class="text-danger small fw-bold text-center"></div>
         </div>
       </div>
     </div>
@@ -282,7 +260,7 @@
       }
 
       // =========================================================
-      // CONTROLE DE RENDERIZAÇÃO DO GOOGLE (MODELO ÍCONE)
+      // CONTROLE DE RENDERIZAÇÃO DO GOOGLE (STANDARD + DELAY)
       // =========================================================
 
       window.onGoogleLibraryLoad = function() {
@@ -299,19 +277,27 @@
               auto_select: false
            });
            
-           // AQUI ESTÁ A MÁGICA: Renderizamos apenas o ÍCONE
-           // Ele tem tamanho fixo e não muda com o nome do usuário.
+           // Voltamos ao 'standard' para preencher a largura e ser todo clicável
            google.accounts.id.renderButton(
               document.getElementById("btn-google-area"),
               { 
-                type: "icon",      // Apenas o 'G'
-                shape: "circle",   // Redondinho
                 theme: "outline", 
-                size: "large"      // 40px padrão
+                size: "large", 
+                shape: "pill",
+                // width: 300 (Isso força o botão a ser grande e clicável)
+                width: 300 
               }
            );
            
+           // Popup independente
            google.accounts.id.prompt(); 
+           
+           // SEGREDO: Só mostra o botão depois de 600ms (tempo para o Google ajustar o layout interno)
+           setTimeout(() => {
+              const el = document.getElementById("google-btn-container");
+              if(el) el.classList.add("visible");
+           }, 600);
+           
            BOTAO_JA_RENDERIZADO = true;
         }
       }
@@ -363,8 +349,12 @@
         document.getElementById('app-container').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
         
+        // Reset Visual
         BOTAO_JA_RENDERIZADO = false;
-        tentarRenderizarBotao();
+        const el = document.getElementById("google-btn-container");
+        if(el) el.classList.remove("visible"); // Torna invisível de novo
+        
+        tentarRenderizarBotao(); // Redesenha (vai demorar 600ms para aparecer)
         
         if (window.google) google.accounts.id.disableAutoSelect();
       };
