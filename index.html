@@ -12,7 +12,6 @@
     <script src="https://accounts.google.com/gsi/client" async defer onload="window.onGoogleLibraryLoad()"></script>
     
     <script>
-      // Script Crítico (Anti-Flash)
       (function() {
         try {
           if (localStorage.getItem('theme') === 'dark') {
@@ -52,11 +51,9 @@
         --shadow-sm: 0 1px 3px rgba(0,0,0,0.5); --shadow-md: 0 4px 15px rgba(0,0,0,0.5);
       }
 
-      /* --- ESTRUTURA GERAL --- */
       html { width: 100%; overflow-x: hidden; }
       body { width: 100%; min-height: 100dvh; margin: 0; padding: 0; background-color: var(--background); color: var(--text-main); font-family: 'Roboto', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
       
-      /* --- COMPONENTES UI --- */
       #overlay-loading { position: fixed; inset: 0; background: var(--background); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
       .app-bar { background-color: var(--surface-container); padding: 1rem 1.5rem; border-radius: 0 0 var(--radius-card) var(--radius-card); display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border: 1px solid var(--outline-variant); border-top: none; }
       .app-title { font-weight: 700; color: var(--primary); font-size: 1.25rem; }
@@ -93,7 +90,7 @@
       /* --- TELA DE LOGIN --- */
       #login-screen { position: fixed; inset: 0; width: 100%; height: 100dvh; overflow-y: auto; background: var(--background); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
-      /* --- CORREÇÃO PULO BOTÃO --- */
+      /* --- VAGA DE ESTACIONAMENTO DO BOTÃO --- */
       .login-slot {
         width: 100%;
         height: 50px; 
@@ -101,16 +98,13 @@
         justify-content: center;
         align-items: center;
         margin-bottom: 1rem;
-        
-        /* 2. Animação de Entrada do Botão */
         opacity: 0; 
-        animation: fadeInButton 0.5s ease forwards;
-        animation-delay: 0.2s; /* Pequeno delay para o iframe carregar invisível antes de mostrar */
+        animation: fadeInButton 0.6s ease forwards; /* Animação suave para esconder carregamento */
       }
 
       @keyframes fadeInButton {
-        from { opacity: 0; transform: translateY(5px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; }
+        to { opacity: 1; }
       }
     
     </style>
@@ -222,9 +216,12 @@
       var DADOS_RELATORIO_ATUAL = null; 
       var DADOS_NOTAS_ATUAL = null; 
       var TIMER_CHECK = null; 
+      
+      // TRAVA DE RENDERIZAÇÃO (Evita duplo-desenho)
+      var BOTAO_JA_RENDERIZADO = false;
 
       // =========================================================
-      // GERENCIAMENTO DE SESSÃO & LOGIN GOOGLE
+      // GESTÃO DE SESSÃO
       // =========================================================
       
       function verificarSessaoSalva() {
@@ -262,34 +259,41 @@
         }, 60 * 1000); 
       }
 
-      // --- DISPARADO AUTOMATICAMENTE QUANDO O SCRIPT DO GOOGLE CARREGA ---
+      // =========================================================
+      // CONTROLE DE RENDERIZAÇÃO DO GOOGLE
+      // =========================================================
+
+      // Função chamada automaticamente pelo <script ... onload> e pelo logout
       window.onGoogleLibraryLoad = function() {
-        // Só renderiza o botão Google SE não estivermos logados
-        if (!verificarSessaoSalva()) {
-           renderizarBotaoGoogle();
-        }
+        tentarRenderizarBotao();
       };
 
-      function renderizarBotaoGoogle() {
+      function tentarRenderizarBotao() {
+        // REGRA DE OURO: Se a sessão é válida OU o botão já foi feito, PARE.
+        if (verificarSessaoSalva() || BOTAO_JA_RENDERIZADO) {
+           return;
+        }
+
         if (window.google) {
            google.accounts.id.initialize({
               client_id: CLIENT_ID_GOOGLE,
               callback: handleCredentialResponse,
-              auto_select: false // Se quiser popup automático, mude para true
+              auto_select: false
            });
            
-           // 1. Renderiza o Botão no lugar certo
            google.accounts.id.renderButton(
               document.getElementById("btn-google-area"),
               { theme: "outline", size: "large", width: 250, shape: "pill" }
            );
            
-           // 2. Aciona o Popup (One Tap) explicitamente
            google.accounts.id.prompt(); 
+           
+           // MARCA COMO FEITO para ninguém chamar de novo
+           BOTAO_JA_RENDERIZADO = true;
         }
       }
 
-      // Callback do Google após Login
+      // Callback de Sucesso
       function handleCredentialResponse(response) {
         USER_TOKEN = response.credential;
         localStorage.setItem(KEY_TOKEN, USER_TOKEN);
@@ -318,7 +322,6 @@
           });
       }
 
-      // Função de Logout (Limpa tudo e renderiza botão)
       window.fazerLogout = function() {
         USER_TOKEN = null;
         DADOS_CACHE = {}; DADOS_RELATORIO_ATUAL = null; DADOS_NOTAS_ATUAL = null;
@@ -338,8 +341,9 @@
         document.getElementById('app-container').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
         
-        // Se sair, precisa mostrar o botão novamente
-        renderizarBotaoGoogle();
+        // No logout, permitimos desenhar de novo
+        BOTAO_JA_RENDERIZADO = false;
+        tentarRenderizarBotao();
         
         if (window.google) google.accounts.id.disableAutoSelect();
       };
@@ -357,7 +361,7 @@
         } catch(e) {}
         
         if (verificarSessaoSalva()) {
-          // --> SESSÃO VÁLIDA: Carrega App, NÃO CARREGA O BOTÃO GOOGLE
+          // SE JÁ LOGADO: Carrega app, IGNORA botão Google
           const dadosUser = parseJwt(USER_TOKEN);
           if (dadosUser && dadosUser.email) {
              document.getElementById('lblUserEmail').innerText = dadosUser.email;
@@ -377,8 +381,10 @@
             .catch(e => {
               window.fazerLogout(); 
             });
+        } else {
+          // SE NÃO LOGADO: O 'onload' do script do Google lá em cima chamará tentarRenderizarBotao()
+          // Nós não precisamos chamar aqui para evitar a duplicidade.
         }
-        // Se a sessão for inválida, o botão será renderizado pelo callback onGoogleLibraryLoad lá em cima
       };
 
       // =========================================================
@@ -427,7 +433,4 @@
       window.copiarNotas = function(btnElement) { if (!DADOS_NOTAS_ATUAL) return; const cfg = { notas: parseInt(document.getElementById('cfgNotas').value) || 3 }; let texto = ""; DADOS_NOTAS_ATUAL.forEach(linha => { let linhaTexto = ""; linha.anos.forEach(ano => { linhaTexto += window.formatarCelula(ano.nota, cfg.notas) + "\t" + window.formatarCelula(ano.ch, cfg.notas) + "\t" + window.formatarCelula(ano.falta, cfg.notas) + "\t"; }); texto += linhaTexto + "\n"; }); window.executarCopiaReal(texto, btnElement); };
       window.copiarSituacao = function(btnElement) { if (!DADOS_RELATORIO_ATUAL) return; const cfg = { situacao: parseInt(document.getElementById('cfgSituacao').value) || 9 }; const trajetoria = DADOS_RELATORIO_ATUAL.trajetoria; let linhaCH = "", linhaDias = "", linhaFaltas = "", linhaPorc = "", linhaRes = ""; trajetoria.forEach(t => { linhaCH += window.formatarCelula(t.existe ? t.ch : "-", cfg.situacao) + "\t"; linhaDias += window.formatarCelula(t.existe ? t.dias : "-", cfg.situacao) + "\t"; linhaFaltas += window.formatarCelula(t.existe ? t.faltas : "-", cfg.situacao) + "\t"; linhaPorc += window.formatarCelula(t.existe ? t.porc : "-", cfg.situacao) + "\t"; linhaRes += window.formatarCelula(t.existe ? t.res : "-", cfg.situacao) + "\t"; }); let texto = linhaCH + "\n" + linhaDias + "\n" + linhaFaltas + "\n" + linhaPorc + "\n" + linhaRes; window.executarCopiaReal(texto, btnElement); };
       window.copiarObservacoes = function(btnElement) { if (!DADOS_RELATORIO_ATUAL) return; const listaObs = DADOS_RELATORIO_ATUAL.trajetoria.filter(t => t.existe && t.obs && String(t.obs).trim() !== "").map(t => t.obs); if (listaObs.length === 0) { alert("Não há observações."); return; } const textoFinal = listaObs.join("\n"); window.executarCopiaReal(textoFinal, btnElement); };
-      window.executarCopiaReal = function(texto, btn) { const textarea = document.createElement('textarea'); textarea.value = texto; textarea.style.position = 'fixed'; textarea.style.left = '0'; textarea.style.top = '0'; textarea.style.width = '1px'; textarea.style.height = '1px'; textarea.style.opacity = '0.1'; document.body.appendChild(textarea); textarea.focus(); textarea.select(); try { const ok = document.execCommand('copy'); if(ok && btn) { const originalHTML = btn.innerHTML; btn.innerHTML = '<i class="fas fa-check"></i> Copiado!'; btn.classList.add('success-state'); setTimeout(() => { btn.innerHTML = originalHTML; btn.classList.remove('success-state'); }, 2000); } } catch (err) { alert("Erro ao copiar."); } document.body.removeChild(textarea); };
-    </script>
-</body>
-</html>
+      window.executarCopiaReal = function(texto, btn) { const textarea = document.createElement('textarea'); textarea.value = texto; textarea.style.position = 'fixed'; textarea.style.left = '0'; textarea.style.top = '0'; textarea.style.width = '1px'; textarea.style.height = '1px'; textarea.style.opacity = '0.1'; document.body.appendChild(textarea); textarea.
