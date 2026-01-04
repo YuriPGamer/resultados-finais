@@ -49,11 +49,9 @@
         --shadow-sm: 0 1px 3px rgba(0,0,0,0.5); --shadow-md: 0 4px 15px rgba(0,0,0,0.5);
       }
 
-      /* --- ESTRUTURA GERAL --- */
       html { width: 100%; overflow-x: hidden; }
       body { width: 100%; min-height: 100dvh; margin: 0; padding: 0; background-color: var(--background); color: var(--text-main); font-family: 'Roboto', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
       
-      /* --- COMPONENTES UI --- */
       #overlay-loading { position: fixed; inset: 0; background: var(--background); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
       .app-bar { background-color: var(--surface-container); padding: 1rem 1.5rem; border-radius: 0 0 var(--radius-card) var(--radius-card); display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border: 1px solid var(--outline-variant); border-top: none; }
       .app-title { font-weight: 700; color: var(--primary); font-size: 1.25rem; }
@@ -90,23 +88,41 @@
       /* --- TELA DE LOGIN --- */
       #login-screen { position: fixed; inset: 0; width: 100%; height: 100dvh; overflow-y: auto; background: var(--background); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
-      /* --- VAGA DE ESTACIONAMENTO DO BOTÃO --- */
-      .login-slot {
-        width: 100%;
-        height: 50px; 
+      /* --- BOTÃO CUSTOMIZADO ESTÁVEL --- */
+      .google-btn-wrapper {
         display: flex;
-        justify-content: center;
         align-items: center;
-        margin-bottom: 1rem;
-        /* Começa invisível para o iframe carregar, depois faz fade-in */
-        opacity: 0; 
-        animation: fadeInButton 0.6s ease forwards; 
-        animation-delay: 0.1s;
+        justify-content: center;
+        gap: 12px;
+        padding: 8px 24px 8px 8px; /* Padding maior na direita pro texto */
+        background-color: var(--background);
+        border: 1px solid var(--outline);
+        border-radius: 50px; /* Pill Shape */
+        width: 100%;
+        max-width: 280px;
+        cursor: pointer;
+        transition: background 0.2s;
+        min-height: 56px; /* Altura fixa para evitar pulos */
+      }
+      
+      .google-btn-wrapper:hover {
+        background-color: var(--surface-container);
       }
 
-      @keyframes fadeInButton {
-        from { opacity: 0; }
-        to { opacity: 1; }
+      /* Texto Estático do Botão */
+      .google-btn-text {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 500;
+        color: var(--text-main);
+        font-size: 1rem;
+      }
+
+      /* Onde o botão real do Google vai morar */
+      #btn-google-area {
+        height: 40px;
+        width: 40px; /* Tamanho exato do ícone */
+        overflow: hidden; /* Garante que só o ícone apareça */
+        border-radius: 50%;
       }
     
     </style>
@@ -122,11 +138,17 @@
         </div>
         
         <div class="d-flex flex-column align-items-center justify-content-center w-100">
-            <div class="login-slot">
-                <div id="btn-google-area"></div>
-            </div>
             
-            <div id="login-error" class="text-danger small fw-bold text-center"></div>
+            <div class="google-btn-wrapper position-relative">
+                
+                <div id="btn-google-area"></div>
+                
+                <span class="google-btn-text">Entrar com Google</span>
+
+                </div>
+            <p class="text-center mt-2" style="font-size: 0.7rem; color: var(--text-secondary); opacity: 0.7;">Clique no ícone "G" para entrar</p>
+            
+            <div id="login-error" class="text-danger small fw-bold text-center mt-3"></div>
         </div>
       </div>
     </div>
@@ -218,8 +240,6 @@
       var DADOS_RELATORIO_ATUAL = null; 
       var DADOS_NOTAS_ATUAL = null; 
       var TIMER_CHECK = null; 
-      
-      // TRAVA: Garante que o botão só seja criado 1 vez
       var BOTAO_JA_RENDERIZADO = false;
 
       // =========================================================
@@ -261,15 +281,15 @@
         }, 60 * 1000); 
       }
 
-      // -------------------------------------------------------------
-      // 1. ESTA FUNÇÃO É CHAMADA QUANDO O SCRIPT DO GOOGLE TERMINA DE BAIXAR
-      // -------------------------------------------------------------
+      // =========================================================
+      // CONTROLE DE RENDERIZAÇÃO DO GOOGLE (MODELO ÍCONE)
+      // =========================================================
+
       window.onGoogleLibraryLoad = function() {
         tentarRenderizarBotao();
       };
 
       function tentarRenderizarBotao() {
-        // Se já está logado OU já desenhou o botão, para tudo.
         if (verificarSessaoSalva() || BOTAO_JA_RENDERIZADO) return;
 
         if (window.google) {
@@ -279,21 +299,23 @@
               auto_select: false
            });
            
-           // Desenha o botão
+           // AQUI ESTÁ A MÁGICA: Renderizamos apenas o ÍCONE
+           // Ele tem tamanho fixo e não muda com o nome do usuário.
            google.accounts.id.renderButton(
               document.getElementById("btn-google-area"),
-              { theme: "outline", size: "large", width: 250, shape: "pill" }
+              { 
+                type: "icon",      // Apenas o 'G'
+                shape: "circle",   // Redondinho
+                theme: "outline", 
+                size: "large"      // 40px padrão
+              }
            );
            
-           // Aciona o Popup
            google.accounts.id.prompt(); 
-           
-           // Marca como feito para não repetir
            BOTAO_JA_RENDERIZADO = true;
         }
       }
 
-      // Callback do Google após Login
       function handleCredentialResponse(response) {
         USER_TOKEN = response.credential;
         localStorage.setItem(KEY_TOKEN, USER_TOKEN);
@@ -341,7 +363,6 @@
         document.getElementById('app-container').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
         
-        // Reseta a trava para desenhar o botão de novo
         BOTAO_JA_RENDERIZADO = false;
         tentarRenderizarBotao();
         
@@ -361,7 +382,6 @@
         } catch(e) {}
         
         if (verificarSessaoSalva()) {
-          // Logado: Carrega App
           const dadosUser = parseJwt(USER_TOKEN);
           if (dadosUser && dadosUser.email) {
              document.getElementById('lblUserEmail').innerText = dadosUser.email;
@@ -382,7 +402,6 @@
               window.fazerLogout(); 
             });
         }
-        // Não logado: O Script do Google lá embaixo vai chamar 'onGoogleLibraryLoad'
       };
 
       // =========================================================
