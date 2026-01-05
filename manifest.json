@@ -1,0 +1,17 @@
+{
+  "name": "Resultados Finais",
+  "short_name": "Resultados",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fdfcff",
+  "theme_color": "#005fa4",
+  "orientation": "portrait",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "./icon.png", 
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
