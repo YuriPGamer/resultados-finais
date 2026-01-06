@@ -82,7 +82,23 @@
       body { width: 100%; min-height: 100dvh; margin: 0; padding: 0; background-color: var(--background); color: var(--text-main); font-family: 'Roboto', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
       
       #overlay-loading { position: fixed; inset: 0; background: var(--background); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-      .app-bar { background-color: var(--surface-container); padding: 1rem 1.5rem; border-radius: 0 0 var(--radius-card) var(--radius-card); display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border: 1px solid var(--outline-variant); border-top: none; }
+.app-bar {
+  background-color: var(--surface-container);
+  padding: 1rem 1.5rem;
+  
+  /* MUDANÇA 1: Arredondar todos os cantos */
+  border-radius: var(--radius-card); 
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border: 1px solid var(--outline-variant);
+  
+  /* MUDANÇA 2: Adicionar margem no topo para desgrudar da barra de status */
+  margin-top: 1rem; 
+  /* Remover o border-top: none antigo pois agora é flutuante */
+}
       .app-title { font-weight: 700; color: var(--primary); font-size: 1.25rem; }
       .m-card { background-color: var(--surface-container); border-radius: var(--radius-card); padding: 1.5rem; border: 1px solid var(--outline-variant); margin-bottom: 1.5rem; }
       .table > tbody > tr > td { background-color: transparent !important; color: var(--text-main) !important; border-color: var(--outline-variant) !important; vertical-align: middle; }
