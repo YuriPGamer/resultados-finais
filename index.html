@@ -92,7 +92,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem;
+
   margin-bottom: 2rem;
   border: 1px solid var(--outline-variant);
 }
@@ -109,7 +109,7 @@
       .form-select:disabled { background-color: var(--outline-variant); opacity: 0.4; border-color: transparent; }
       .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-container); outline: none; }
       .btn-icon { background: transparent; border: none; color: var(--text-secondary); font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
-      .btn-icon:hover { background-color: var(--primary-container); color: var(--on-primary-container); }
+      .btn-icon:hover { backgroun-color: var(--primary-container); color: var(--on-primary-container); }
       .btn-action { background-color: var(--primary); color: var(--on-primary); border: none; border-radius: var(--radius-btn); padding: 0.5rem 1.2rem; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; box-shadow: var(--shadow-sm); }
       .btn-action.btn-sm { padding: 0.25rem 0.8rem !important; font-size: 0.75rem !important; }
       .btn-action:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: var(--shadow-md); }
@@ -125,7 +125,7 @@
       /* --- CONTROLE DE SESSÃO --- */
       html[data-session="active"] #login-screen { display: none !important; }
       html[data-session="active"] #overlay-loading { display: flex !important; }
-      html[data-session="active"] #app-container { display: block !important; }
+      html[data-session="active"] #app-container { display: block !important;   padding-top: 1rem;}
 
       /* --- TELA DE LOGIN --- */
       #login-screen { position: fixed; inset: 0; width: 100%; height: 100dvh; overflow-y: auto; background: var(--background); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
