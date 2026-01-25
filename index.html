@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#fdfcff" id="meta-theme-color">
   
   <title>CEEMTI BG</title>
@@ -76,13 +76,6 @@
     /* =========================================
        ESTILOS GERAIS
        ========================================= */
-    html { 
-      width: 100%; 
-      overflow-x: hidden; 
-      /* ADICIONE ESTA LINHA: Garante que a cor de fundo vá até o topo */
-      background-color: var(--background); 
-    }
-    
     body {
       width: 100%;
       min-height: 100dvh;
@@ -91,7 +84,6 @@
       font-family: 'Roboto', sans-serif;
       transition: background-color 0.3s ease, color 0.3s ease;
       padding-bottom: 60px;
-      padding-top: env(safe-area-inset-top);
     }
 
     /* Header */
