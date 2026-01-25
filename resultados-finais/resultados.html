@@ -223,9 +223,15 @@
       background-color: var(--primary);
       border-color: var(--primary);
     }
-    tr.selected-row td {
-      background-color: var(--table-stripe) !important;
-      font-weight: 500;
+    /* --- DESTAQUE DE LINHA SELECIONADA --- */
+    tr.selected-row > td {
+      background-color: var(--primary-container) !important;
+      color: var(--on-primary-container) !important;
+      transition: background-color 0.2s;
+    }
+    /* Pequeno ajuste para manter a cor da borda sutil */
+    tr.selected-row > td {
+      border-bottom-color: rgba(255,255,255,0.1) !important;
     }
 
     /* =========================================
@@ -866,7 +872,7 @@
               </thead>
               <tbody>
                 ${tabela.map((linha, idx) => `
-                  <tr>
+                  <tr class="selected-row">
                     <td class="text-start fw-bold text-nowrap">
                       <label class="chk-container start">
                         <input type="checkbox" class="form-check-input chk-row-item" data-row-index="${idx}" checked onchange="window.verificarMasterCheckbox()">
@@ -882,22 +888,40 @@
       document.getElementById('areaNotas').innerHTML = html; 
     };
 
-    // Função 1: O "Selecionar Tudo" do cabeçalho das Disciplinas
+    // Função 1: O "Selecionar Tudo" (Atualiza visual de TODAS as linhas)
     window.toggleAllRows = function(masterChk) {
       const checkboxes = document.querySelectorAll('.chk-row-item');
-      checkboxes.forEach(chk => chk.checked = masterChk.checked);
+      checkboxes.forEach(chk => {
+        chk.checked = masterChk.checked;
+        
+        // Encontra a linha (TR) pai deste checkbox
+        const tr = chk.closest('tr');
+        if (masterChk.checked) {
+          tr.classList.add('selected-row');
+        } else {
+          tr.classList.remove('selected-row');
+        }
+      });
     };
 
-    // Função 2: Verifica se deve marcar/desmarcar o "Selecionar Tudo" ao clicar em uma disciplina
+    // Função 2: Verifica individualmente (Atualiza visual da linha CLICADA)
     window.verificarMasterCheckbox = function() {
       const all = document.querySelectorAll('.chk-row-item');
+      
+      // Atualiza o visual de cada linha baseada em seu checkbox
+      all.forEach(chk => {
+         const tr = chk.closest('tr');
+         if (chk.checked) {
+           tr.classList.add('selected-row');
+         } else {
+           tr.classList.remove('selected-row');
+         }
+      });
+
+      // Lógica do Master Checkbox (Cabeçalho)
       const checked = document.querySelectorAll('.chk-row-item:checked');
       const master = document.getElementById('chk-all-rows');
-      
-      // Se todos estiverem marcados, marca o master. Se um estiver desmarcado, desmarca o master.
-      master.checked = (all.length === checked.length);
-      // Opcional: Se quiser o comportamento "indeterminado" (tracinho) quando apenas alguns estão marcados:
-      // master.indeterminate = (checked.length > 0 && checked.length < all.length);
+      if(master) master.checked = (all.length === checked.length);
     };
 
     window.copiarNotas = function(btnElement) { 
