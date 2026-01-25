@@ -222,7 +222,11 @@
     .table .form-check-input:checked {
       background-color: var(--primary);
       border-color: var(--primary);
-    }    
+    }
+    tr.selected-row td {
+      background-color: var(--table-stripe) !important;
+      font-weight: 500;
+    }
 
     /* =========================================
        TELAS DE LOGIN E LOADING
@@ -843,10 +847,10 @@
               <thead>
                 <tr>
                   <th rowspan="2" class="align-middle">
-                    <div class="chk-container start">
+                    <label class="chk-container start">
                        <input type="checkbox" class="form-check-input" id="chk-all-rows" checked onchange="window.toggleAllRows(this)">
                        <span>DISCIPLINA</span>
-                    </div>
+                    </label>
                   </th>
                   ${trajetoria.map((t, index) => `
                     <th colspan="3" class="${t.existe ? '' : 'text-muted'}">
@@ -864,10 +868,10 @@
                 ${tabela.map((linha, idx) => `
                   <tr>
                     <td class="text-start fw-bold text-nowrap">
-                      <div class="chk-container start">
+                      <label class="chk-container start">
                         <input type="checkbox" class="form-check-input chk-row-item" data-row-index="${idx}" checked onchange="window.verificarMasterCheckbox()">
                         <span>${linha.disciplina}</span>
-                      </div>
+                      </label>
                     </td>
                     ${linha.anos.map(ano => `<td>${ano.nota}</td><td>${ano.ch}</td><td>${ano.falta}</td>`).join('')}
                   </tr>`).join('')}
@@ -937,8 +941,8 @@
             // Itera sobre os anos (colunas)
             if (dadosLinha.anos) {
               dadosLinha.anos.forEach((ano, idxAno) => { 
-                // Só adiciona se a coluna (Ano) estiver marcada no cabeçalho
-                if (colunasMarcadas[idxAno]) {
+    // Segurança: Verifica se existe checkbox para esse índice
+    if (colunasMarcadas[idxAno] !== undefined && colunasMarcadas[idxAno] === true) {
                    linhaTexto += window.formatarCelula(ano.nota, notasTabs) + "\t" + 
                                  window.formatarCelula(ano.ch, notasTabs) + "\t" + 
                                  window.formatarCelula(ano.falta, notasTabs) + "\t"; 
