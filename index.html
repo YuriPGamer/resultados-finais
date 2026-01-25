@@ -7,9 +7,7 @@
   
   <title>CEEMTI BG</title>
 
-  <link rel="stylesheet" href="./style.css">
-
-  <link rel="manifest" href="./manifest.json">
+  <link rel="manifest" href="./pwa/manifest.json">
   <link rel="apple-touch-icon" href="./icon.png">  
   <link rel="icon" type="image/png" href="./icon.png">
 
@@ -20,7 +18,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <script>
-    // Script Anti-Flicker (Mantido inline para execução imediata)
+    // Script Anti-Flicker para o Tema (Mesma lógica dos seus apps)
     (function() {
       try {
         const savedTheme = localStorage.getItem('theme');
@@ -32,6 +30,156 @@
       } catch (e) {}
     })();
   </script>
+
+  <style>
+    /* =========================================
+       VARIÁVEIS DE TEMA (Idênticas aos seus apps)
+       ========================================= */
+    :root {
+      /* Cores Light */
+      --primary: #005fa4;
+      --on-primary: #ffffff;
+      --primary-container: #d5e3ff;
+      --on-primary-container: #001b3c;
+      --background: #fdfcff;
+      --surface: #fdfcff;
+      --surface-container: #f0f4f9;
+      --outline: #74777f;
+      --outline-variant: #c4c7cf;
+      --text-main: #1a1c1e;
+      --text-secondary: #3b3f46;
+      
+      /* Layout */
+      --radius-card: 24px;
+      --radius-btn: 100px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] {
+      /* Cores Dark */
+      --primary: #a8c7fa;
+      --on-primary: #00315b;
+      --primary-container: #004786;
+      --on-primary-container: #d5e3ff;
+      --background: #111315;
+      --surface: #111315;
+      --surface-container: #1d2024;
+      --outline: #8e9099;
+      --outline-variant: #44474e;
+      --text-main: #e2e2e6;
+      --text-secondary: #c4c7c5;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+      --shadow-hover: 0 10px 15px rgba(0,0,0,0.5);
+    }
+
+    /* =========================================
+       ESTILOS GERAIS
+       ========================================= */
+    body {
+      width: 100%;
+      min-height: 100dvh;
+      background-color: var(--background);
+      color: var(--text-main);
+      font-family: 'Roboto', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      padding-bottom: 60px;
+    }
+
+    /* Header */
+    .app-bar {
+      background-color: var(--surface-container);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-card);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border: 1px solid var(--outline-variant);
+    }
+    .app-title { font-weight: 700; color: var(--text-secondary); font-size: 1.25rem; }
+
+    /* Botão Tema */
+    .btn-icon {
+      background: transparent; border: none; color: var(--text-secondary);
+      font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%;
+      transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-icon:hover { background-color: var(--primary-container); color: var(--on-primary-container); }
+
+    /* =========================================
+       CARD DE APLICAÇÃO (VERSÃO COMPACTA)
+       ========================================= */
+    .app-card {
+      background-color: var(--surface-container);
+      border-radius: 16px; /* Borda um pouco menos arredondada */
+      padding: 1.5rem;     /* Reduzido de 2rem */
+      border: 1px solid var(--outline-variant);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-card:hover {
+      transform: translateY(-3px); /* Movimento mais sutil */
+      box-shadow: var(--shadow-hover);
+      border-color: var(--primary);
+    }
+
+    .app-icon-container {
+      width: 56px;        /* Reduzido de 80px */
+      height: 56px;       /* Reduzido de 80px */
+      background-color: var(--primary-container);
+      color: var(--on-primary-container);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;  /* Ícone menor */
+      margin-bottom: 1rem;
+      transition: 0.3s;
+    }
+
+    .app-card:hover .app-icon-container {
+      transform: scale(1.1);
+      background-color: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .card-title {
+      font-size: 1.1rem; /* Fonte menor */
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 0;
+    }
+
+    .action-arrow {
+      margin-top: 1rem;
+      font-size: 0.9rem; /* Seta menor */
+      color: var(--primary);
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .app-card:hover .action-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  </style>
 </head>
 <body>
 
@@ -53,15 +201,17 @@
         <p style="color: var(--text-secondary)">Selecione uma ferramenta abaixo para começar.</p>
     </div>
 
-    <div class="row g-3">
-        <div class="col-12 col-md-6 col-lg-4"> 
-            <a href="./resultados-finais/resultados.html" class="app-card">
+    <div class="row g-3"> <div class="col-12 col-md-6 col-lg-4"> <a href="./resultados-finais/resultados.html" class="app-card">
                 <div class="app-icon-container">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
                 <h3 class="card-title">Resultados Finais</h3>
-                <p class="card-desc">Consultar Atas de Resultados Finais.</p>
-                <div class="action-arrow">Acessar <i class="fas fa-arrow-right ms-1"></i></div>
+                <p class="card-desc">
+                    Consultar Atas de Resultados Finais.
+                </p>
+                <div class="action-arrow">
+                    Acessar <i class="fas fa-arrow-right ms-1"></i>
+                </div>
             </a>
         </div>
 
@@ -71,28 +221,38 @@
                     <i class="fas fa-code"></i>
                 </div>
                 <h3 class="card-title">Instalar Scripts</h3>
-                <p class="card-desc">Catálogo de automações para o navegador.</p>
-                <div class="action-arrow">Acessar <i class="fas fa-arrow-right ms-1"></i></div>
+                <p class="card-desc">
+                    Catálogo de automações para o navegador.
+                </p>
+                <div class="action-arrow">
+                    Acessar <i class="fas fa-arrow-right ms-1"></i>
+                </div>
             </a>
         </div>
+
     </div>
 
   </div>
 
   <script>
-    // Funções de Tema
+    // Funções de conversão de cor para animação
     function hexToRgb(hex) {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
       return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
     }
+
     function rgbToHex(r, g, b) {
       return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
+
     function animarMetaCor(corOrigem, corDestino, duration) {
-      const start = hexToRgb(corOrigem); const end = hexToRgb(corDestino);
+      const start = hexToRgb(corOrigem);
+      const end = hexToRgb(corDestino);
       const metaTag = document.getElementById('meta-theme-color');
+      
       if (!start || !end || !metaTag) return;
       let startTime = null;
+
       function animationStep(timestamp) {
         if (!startTime) startTime = timestamp;
         const progress = timestamp - startTime;
@@ -105,10 +265,14 @@
       }
       window.requestAnimationFrame(animationStep);
     }
+
     window.toggleTheme = function() {
-      const htmlTag = document.documentElement; const icon = document.getElementById('icon-theme');
-      const COR_LIGHT = '#fdfcff'; const COR_DARK = '#111315';
+      const htmlTag = document.documentElement;
+      const icon = document.getElementById('icon-theme');
+      const COR_LIGHT = '#fdfcff';
+      const COR_DARK = '#111315';
       const isDark = htmlTag.getAttribute('data-theme') === 'dark';
+      
       if (isDark) {
         htmlTag.removeAttribute('data-theme');
         if(icon) icon.classList.replace('fa-sun', 'fa-moon');
@@ -121,14 +285,19 @@
         animarMetaCor(COR_LIGHT, COR_DARK, 300);
       }
     };
+
     window.onload = function() {
+        // Ajusta ícone ao carregar se estiver em Dark Mode
         if (document.documentElement.getAttribute('data-theme') === 'dark') {
             const icon = document.getElementById('icon-theme');
             if(icon) icon.classList.replace('fa-moon', 'fa-sun');
         }
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').catch(err => console.log('Falha no SW:', err));
-        }
+
+      // Registro do Service Worker
+      if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./pwa/sw.js')
+            .catch(err => console.log('Falha no SW:', err));
+      }
     };    
   </script>
 </body>
