@@ -873,7 +873,6 @@
         <div class="m-card">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="text-secondary mb-0 text-uppercase small ls-1 fw-bold">APROVEITAMENTO</h6>
-            
             <button id="btnCopiarNotas" onclick="window.copiarNotas(this)" class="btn-action btn-sm"><i class="fas fa-copy"></i> Copiar</button>
           </div>
           <div class="table-responsive">
@@ -881,17 +880,17 @@
               <thead>
                 <tr>
                   <th rowspan="2" class="align-middle">
-                    <label class="chk-container start">
+                    <label class="chk-container start" style="cursor: pointer;">
                        <input type="checkbox" class="form-check-input" id="chk-all-rows" checked onchange="window.toggleAllRows(this)">
                        <span>DISCIPLINA</span>
                     </label>
                   </th>
                   ${trajetoria.map((t, index) => `
                     <th colspan="3" class="${t.existe ? '' : 'text-muted'}">
-                      <div class="chk-container">
+                      <label class="chk-container" style="cursor: pointer;">
                         <input type="checkbox" class="form-check-input chk-col-header" data-col-index="${index}" checked onchange="window.atualizarTextoBotao()">
                         <span>${t.existe ? t.turma : t.ano}</span>
-                      </div>
+                      </label>
                     </th>`).join('')}
                 </tr>
                 <tr>
@@ -902,7 +901,7 @@
                 ${tabela.map((linha, idx) => `
                   <tr>
                     <td class="text-start fw-bold text-nowrap">
-                      <label class="chk-container start">
+                      <label class="chk-container start" style="cursor: pointer;">
                         <input type="checkbox" class="form-check-input chk-row-item" data-row-index="${idx}" checked onchange="window.verificarMasterCheckbox()">
                         <span>${linha.disciplina}</span>
                       </label>
