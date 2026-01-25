@@ -222,6 +222,41 @@
       display: flex; justify-content: center; align-items: center;
       overflow: hidden; margin-bottom: 1rem; border-radius: 22px;
     }
+
+    /* =========================================
+       BOTÃO VOLTAR
+       ========================================= */
+    .btn-nav-back {
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 10px;
+      padding: 0.75rem 2rem;
+      border-radius: var(--radius-btn);
+      border: 1px solid var(--outline);
+      color: var(--text-secondary);
+      background-color: transparent;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      width: 100%; /* No celular ocupa largura total */
+      max-width: 300px; /* Limite no PC */
+    }
+    
+    .btn-nav-back:hover {
+      background-color: var(--surface-container);
+      color: var(--text-main);
+      border-color: var(--text-secondary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-nav-back:active {
+      transform: scale(0.98);
+    }
+
   </style>
 </head>
 <body>
@@ -290,6 +325,13 @@
 
     <div id="resultadoArea"></div>
     <div id="areaNotas"></div>
+    <div class="d-flex justify-content-center w-100">
+      <a href="../index.html" class="btn-nav-back">
+        <i class="fas fa-arrow-left"></i> Voltar ao Início
+      </a>
+    </div>
+
+  </div>    
   </div>
 
   <div class="modal fade" id="modalConfig" tabindex="-1">
