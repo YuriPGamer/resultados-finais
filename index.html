@@ -108,43 +108,41 @@
     .btn-icon:hover { background-color: var(--primary-container); color: var(--on-primary-container); }
 
     /* =========================================
-       CARD DE APLICAÇÃO (LAUNCHER)
+       CARD DE APLICAÇÃO (VERSÃO COMPACTA)
        ========================================= */
     .app-card {
       background-color: var(--surface-container);
-      border-radius: var(--radius-card);
-      padding: 2rem;
+      border-radius: 16px; /* Borda um pouco menos arredondada */
+      padding: 1.5rem;     /* Reduzido de 2rem */
       border: 1px solid var(--outline-variant);
       height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      text-decoration: none; /* Remove sublinhado do link */
+      text-decoration: none;
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       position: relative;
       overflow: hidden;
     }
 
-    /* Efeito Hover no Card */
     .app-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px); /* Movimento mais sutil */
       box-shadow: var(--shadow-hover);
       border-color: var(--primary);
     }
 
-    /* Ícone do App */
     .app-icon-container {
-      width: 80px;
-      height: 80px;
+      width: 56px;        /* Reduzido de 80px */
+      height: 56px;       /* Reduzido de 80px */
       background-color: var(--primary-container);
       color: var(--on-primary-container);
-      border-radius: 50%; /* Circular */
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
+      font-size: 1.5rem;  /* Ícone menor */
+      margin-bottom: 1rem;
       transition: 0.3s;
     }
 
@@ -155,23 +153,23 @@
     }
 
     .card-title {
-      font-size: 1.25rem;
+      font-size: 1.1rem; /* Fonte menor */
       font-weight: 700;
       color: var(--text-main);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
     }
 
     .card-desc {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-secondary);
-      line-height: 1.5;
+      line-height: 1.4;
+      margin-bottom: 0;
     }
 
-    /* Seta indicativa que aparece no hover */
     .action-arrow {
-      margin-top: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.9rem; /* Seta menor */
       color: var(--primary);
-      font-size: 1.2rem;
       opacity: 0;
       transform: translateX(-10px);
       transition: all 0.3s ease;
@@ -203,16 +201,13 @@
         <p style="color: var(--text-secondary)">Selecione uma ferramenta abaixo para começar.</p>
     </div>
 
-    <div class="row g-4">
-        
-        <div class="col-12 col-md-6">
-            <a href="./resultados-finais/resultados.html" class="app-card">
+    <div class="row g-3 justify-content-center"> <div class="col-12 col-md-5 col-lg-4"> <a href="./resultados-finais/resultados.html" class="app-card">
                 <div class="app-icon-container">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
                 <h3 class="card-title">Resultados Finais</h3>
                 <p class="card-desc">
-                    Consulta estruturada das Atas de Resultados Finais para elaboração de documentos escolares. Acesso restrito via Google.
+                    Consulta de boletins e relatórios.
                 </p>
                 <div class="action-arrow">
                     Acessar <i class="fas fa-arrow-right ms-1"></i>
@@ -220,14 +215,14 @@
             </a>
         </div>
 
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-5 col-lg-4">
             <a href="./instalar-scripts/scripts.html" class="app-card">
                 <div class="app-icon-container">
                     <i class="fas fa-code"></i>
                 </div>
                 <h3 class="card-title">Instalar Scripts</h3>
                 <p class="card-desc">
-                    Catálogo de Bookmarklets e automações para o navegador. Arraste e solte para instalar na barra de favoritos.
+                    Catálogo de automações para o navegador.
                 </p>
                 <div class="action-arrow">
                     Acessar <i class="fas fa-arrow-right ms-1"></i>
@@ -235,7 +230,8 @@
             </a>
         </div>
 
-        </div>
+    </div>
+
   </div>
 
   <script>
