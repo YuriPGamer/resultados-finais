@@ -7,7 +7,7 @@
   
   <title>CEEMTI BAIXO GUANDU</title>
 
-  <link rel="manifest" href="../pwa/manifest.json">
+  <link rel="manifest" href="./pwa/manifest.json">
   <link rel="apple-touch-icon" href="./icon.png">  
   <link rel="icon" type="image/png" href="./icon.png">
 
@@ -300,7 +300,7 @@
 
       // Registro do Service Worker
       if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('../pwa/sw.js')
+          navigator.serviceWorker.register('./pwa/sw.js')
             .catch(err => console.log('Falha no SW:', err));
       }
     };    
