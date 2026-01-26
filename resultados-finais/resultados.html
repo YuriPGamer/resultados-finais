@@ -904,20 +904,18 @@
       const isTodasRows = (rowChecks.length === rowsChecked.length);
       const isTudoFull = (isTodasCols && isTodasRows);
       
-      // NOVA LÓGICA: Verifica se existe algo para copiar
-      // Precisa ter pelo menos 1 coluna E pelo menos 1 linha marcada
       const temDadosParaCopiar = (colsChecked.length > 0 && rowsChecked.length > 0);
 
       // 2. Atualiza Botão (Texto e Visibilidade)
       const btn = document.getElementById('btnCopiarNotas');
       if (btn) {
         if (temDadosParaCopiar) {
-           // Se tem dados, mostra o botão e define o texto
-           btn.style.display = 'inline-flex'; 
+           // MUDANÇA AQUI: Usamos visibility para manter o espaço físico
+           btn.style.visibility = 'visible'; 
            btn.innerHTML = isTudoFull ? '<i class="fas fa-copy"></i> Copiar' : '<i class="fas fa-copy"></i> Copiar Seleção';
         } else {
-           // Se não tem dados (seleção vazia ou inválida), esconde o botão
-           btn.style.display = 'none';
+           // O botão fica invisível, mas "segura" a altura do cabeçalho
+           btn.style.visibility = 'hidden';
         }
       }
 
