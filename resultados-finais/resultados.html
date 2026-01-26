@@ -891,7 +891,7 @@
     // LÓGICA DE VISUALIZAÇÃO E CONTROLE (MATRIZ UNIFICADA)
     // =========================================================
 
-    // Função Central: Controla Cores e Texto do Botão
+    // Função Central: Controla Cores, Texto e Visibilidade do Botão
     window.atualizarVisualMatriz = function() {
       // 1. Coleta estados
       const colHeaders = document.querySelectorAll('.chk-col-header');
@@ -903,11 +903,22 @@
       const isTodasCols = (colHeaders.length === colsChecked.length);
       const isTodasRows = (rowChecks.length === rowsChecked.length);
       const isTudoFull = (isTodasCols && isTodasRows);
+      
+      // NOVA LÓGICA: Verifica se existe algo para copiar
+      // Precisa ter pelo menos 1 coluna E pelo menos 1 linha marcada
+      const temDadosParaCopiar = (colsChecked.length > 0 && rowsChecked.length > 0);
 
-      // 2. Atualiza Texto do Botão
+      // 2. Atualiza Botão (Texto e Visibilidade)
       const btn = document.getElementById('btnCopiarNotas');
       if (btn) {
-        btn.innerHTML = isTudoFull ? '<i class="fas fa-copy"></i> Copiar' : '<i class="fas fa-copy"></i> Copiar Seleção';
+        if (temDadosParaCopiar) {
+           // Se tem dados, mostra o botão e define o texto
+           btn.style.display = 'inline-flex'; 
+           btn.innerHTML = isTudoFull ? '<i class="fas fa-copy"></i> Copiar' : '<i class="fas fa-copy"></i> Copiar Seleção';
+        } else {
+           // Se não tem dados (seleção vazia ou inválida), esconde o botão
+           btn.style.display = 'none';
+        }
       }
 
       // 3. Atualiza Master Checkbox
@@ -915,22 +926,17 @@
       if (master) master.checked = isTodasRows;
 
       // 4. APLICA AS CORES (Highlight)
-      // Se tudo estiver marcado, limpa visual. Se não, aplica lógica de interseção.
-      
-      // Mapeia quais colunas (índices) estão ativas
       const mapaColunasAtivas = Array.from(colHeaders).map(chk => chk.checked);
 
       rowChecks.forEach(rowChk => {
         const tr = rowChk.closest('tr');
-        const cells = tr.querySelectorAll('td[data-year-idx]'); // Pega apenas células de dados
+        const cells = tr.querySelectorAll('td[data-year-idx]');
 
         cells.forEach(td => {
           const anoIdx = parseInt(td.getAttribute('data-year-idx'));
           const isColAtiva = mapaColunasAtivas[anoIdx];
           const isRowAtiva = rowChk.checked;
 
-          // Regra de Ouro:
-          // Pinta SE (Não for Full) E (Linha Marcada) E (Coluna Marcada)
           if (!isTudoFull && isRowAtiva && isColAtiva) {
             td.classList.add('highlight-cell');
           } else {
