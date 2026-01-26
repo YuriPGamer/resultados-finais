@@ -225,15 +225,11 @@
     }
     
     /* --- DESTAQUE DE CÉLULA (MATRIZ DINÂMICA) --- */
-    td.highlight-cell {
+    /* A classe agora é aplicada no TD, não mais no TR */
+    .table tbody td.highlight-cell {
       background-color: var(--primary-container) !important;
       color: var(--on-primary-container) !important;
       transition: background-color 0.2s;
-      border-bottom-color: rgba(255,255,255,0.1) !important;
-    }
-    
-    /* Pequeno ajuste para manter a cor da borda sutil */
-    .table tbody tr.selected-row > td {
       border-bottom-color: rgba(255,255,255,0.1) !important;
     }
 
@@ -842,30 +838,6 @@
       const qtdTabs = Math.max(0, (mesclagem || 1) - 1);
       const tabs = "\t".repeat(qtdTabs); 
       return valor + tabs; 
-    };
-
-    // Função Auxiliar: Atualiza o texto do botão Copiar
-    window.atualizarTextoBotao = function() {
-      const btn = document.getElementById('btnCopiarNotas');
-      if (!btn) return;
-
-      // Conta colunas
-      const allCols = document.querySelectorAll('.chk-col-header');
-      const checkedCols = document.querySelectorAll('.chk-col-header:checked');
-      const colsCompleto = (allCols.length === checkedCols.length);
-
-      // Conta linhas
-      const allRows = document.querySelectorAll('.chk-row-item');
-      const checkedRows = document.querySelectorAll('.chk-row-item:checked');
-      const rowsCompleto = (allRows.length === checkedRows.length);
-
-      // Se TUDO estiver marcado (Linhas E Colunas) -> "Copiar"
-      // Se qualquer coisa faltar -> "Copiar Seleção"
-      if (colsCompleto && rowsCompleto) {
-        btn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
-      } else {
-        btn.innerHTML = '<i class="fas fa-copy"></i> Copiar Seleção';
-      }
     };    
     
     window.renderizarTabelaFinal = function(tabela, trajetoria) { 
