@@ -891,56 +891,83 @@
     // LÓGICA DE VISUALIZAÇÃO E CONTROLE (MATRIZ UNIFICADA)
     // =========================================================
 
-    // Função Central: Controla Cores, Texto e Visibilidade do Botão
+    // Variável para evitar chamadas duplicadas no mesmo frame
+    let frameVisualUpdate = null;
+
     window.atualizarVisualMatriz = function() {
-      // 1. Coleta estados
-      const colHeaders = document.querySelectorAll('.chk-col-header');
-      const rowChecks = document.querySelectorAll('.chk-row-item');
-      
-      const colsChecked = document.querySelectorAll('.chk-col-header:checked');
-      const rowsChecked = document.querySelectorAll('.chk-row-item:checked');
+      // Se já tiver uma atualização agendada, cancela a anterior (evita trabalho dobrado)
+      if (frameVisualUpdate) cancelAnimationFrame(frameVisualUpdate);
 
-      const isTodasCols = (colHeaders.length === colsChecked.length);
-      const isTodasRows = (rowChecks.length === rowsChecked.length);
-      const isTudoFull = (isTodasCols && isTodasRows);
-      
-      const temDadosParaCopiar = (colsChecked.length > 0 && rowsChecked.length > 0);
+      // Agenda a atualização para o próximo "respiro" do navegador
+      frameVisualUpdate = requestAnimationFrame(() => {
+        
+        // 1. Coleta estados (Leitura do DOM)
+        const colHeaders = document.querySelectorAll('.chk-col-header');
+        const rowChecks = document.querySelectorAll('.chk-row-item');
+        
+        // Otimização: Usar Array.from para evitar querySelectorAll repetido
+        const mapaCols = Array.from(colHeaders).map(chk => chk.checked);
+        const mapaRows = Array.from(rowChecks).map(chk => chk.checked);
 
-      // 2. Atualiza Botão (Texto e Visibilidade)
-      const btn = document.getElementById('btnCopiarNotas');
-      if (btn) {
-        if (temDadosParaCopiar) {
-           // MUDANÇA AQUI: Usamos visibility para manter o espaço físico
-           btn.style.visibility = 'visible'; 
-           btn.innerHTML = isTudoFull ? '<i class="fas fa-copy"></i> Copiar' : '<i class="fas fa-copy"></i> Copiar Seleção';
-        } else {
-           // O botão fica invisível, mas "segura" a altura do cabeçalho
-           btn.style.visibility = 'hidden';
-        }
-      }
+        const qtdColsChecked = mapaCols.filter(Boolean).length;
+        const qtdRowsChecked = mapaRows.filter(Boolean).length;
 
-      // 3. Atualiza Master Checkbox
-      const master = document.getElementById('chk-all-rows');
-      if (master) master.checked = isTodasRows;
+        const isTodasCols = (colHeaders.length === qtdColsChecked);
+        const isTodasRows = (rowChecks.length === qtdRowsChecked);
+        const isTudoFull = (isTodasCols && isTodasRows);
+        
+        const temDadosParaCopiar = (qtdColsChecked > 0 && qtdRowsChecked > 0);
 
-      // 4. APLICA AS CORES (Highlight)
-      const mapaColunasAtivas = Array.from(colHeaders).map(chk => chk.checked);
-
-      rowChecks.forEach(rowChk => {
-        const tr = rowChk.closest('tr');
-        const cells = tr.querySelectorAll('td[data-year-idx]');
-
-        cells.forEach(td => {
-          const anoIdx = parseInt(td.getAttribute('data-year-idx'));
-          const isColAtiva = mapaColunasAtivas[anoIdx];
-          const isRowAtiva = rowChk.checked;
-
-          if (!isTudoFull && isRowAtiva && isColAtiva) {
-            td.classList.add('highlight-cell');
+        // 2. Atualiza Botão (Escrita no DOM)
+        const btn = document.getElementById('btnCopiarNotas');
+        if (btn) {
+          if (temDadosParaCopiar) {
+             btn.style.visibility = 'visible'; 
+             // Só altera o HTML se o texto realmente mudou (evita repaint desnecessário)
+             const novoTexto = isTudoFull ? '<i class="fas fa-copy"></i> Copiar' : '<i class="fas fa-copy"></i> Copiar Seleção';
+             if (btn.innerHTML !== novoTexto) btn.innerHTML = novoTexto;
           } else {
-            td.classList.remove('highlight-cell');
+             btn.style.visibility = 'hidden';
+          }
+        }
+
+        // 3. Atualiza Master Checkbox
+        const master = document.getElementById('chk-all-rows');
+        if (master) master.checked = isTodasRows;
+
+        // 4. APLICA AS CORES (Batch Update)
+        // Aqui está o segredo: só mexemos nas classes se realmente precisar
+        rowChecks.forEach((chk, idxRow) => {
+          const tr = chk.closest('tr');
+          const isRowAtiva = mapaRows[idxRow];
+          
+          // Seleciona apenas as células de dados dessa linha
+          const cells = tr.children; // Mais rápido que querySelectorAll
+          
+          // Começamos do índice 1 porque o 0 é o nome da disciplina
+          for (let i = 1; i < cells.length; i++) {
+             const td = cells[i];
+             // Recupera o índice do ano (guardado no dataset)
+             const anoIdx = parseInt(td.getAttribute('data-year-idx'));
+             
+             // Se não tiver o atributo (ex: célula vazia ou erro), ignora
+             if (isNaN(anoIdx)) continue;
+
+             const isColAtiva = mapaCols[anoIdx];
+             const devePintar = (!isTudoFull && isRowAtiva && isColAtiva);
+
+             // Só toca no DOM se o estado mudar
+             const jaTemClasse = td.classList.contains('highlight-cell');
+             
+             if (devePintar && !jaTemClasse) {
+               td.classList.add('highlight-cell');
+             } else if (!devePintar && jaTemClasse) {
+               td.classList.remove('highlight-cell');
+             }
           }
         });
+        
+        frameVisualUpdate = null; // Limpa o frame
       });
     };
 
